@@ -9,6 +9,9 @@ function App() {
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE);
   const [filterCountry, setFilterCountry] = useState<string | null>(null);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
   // useRef -> para guardar un valor
   // que queremos que se comparta entre renderizados
   // pero que al cambiar, no vuelva a renderizar el componente
@@ -38,7 +41,8 @@ function App() {
   };
 
   useEffect(() => {
-    fetch("https://randomuser.me/api?results=100")
+    setLoading(true);
+    fetch("https://randomuser.me/api?results=10")
       .then(async (res) => await res.json())
       .then((res) => {
         setUsers(res.results);
@@ -46,6 +50,9 @@ function App() {
       })
       .catch((err) => {
         console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -77,25 +84,6 @@ function App() {
     });
   }, [filteredUsers, sorting]);
 
-  // const filteredUsers = (() => {
-  //   console.log('calculate filteredUsers')
-  //   return filterCountry != null && filterCountry.length > 0
-  //     ? users.filter(user => {
-  //       return user.location.country.toLowerCase().includes(filterCountry.toLowerCase())
-  //     })
-  //     : users
-  // })()
-
-  // const sortedUsers = (() => {
-  //   console.log('calculate sortedUsers')
-
-  //   return sortByCountry
-  //     ? filteredUsers.toSorted(
-  //       (a, b) => a.location.country.localeCompare(b.location.country)
-  //     )
-  //     : filteredUsers
-  // })()
-
   return (
     <div className="App">
       <h1>Prueba técnica</h1>
@@ -118,12 +106,17 @@ function App() {
         />
       </header>
       <main>
-        <UsersList
-          changeSorting={handleChangeSort}
-          deleteUser={handleDelete}
-          showColors={showColors}
-          users={sortedUsers}
-        />
+        {loading && <p>Cargando...</p>}
+        {!loading && error && <p>Ha ocurrido un error</p>}
+        {!loading && !error && users.length === 0 && <p>No hay usuarios</p>}
+        {!loading && !error && users.length > 0 && (
+          <UsersList
+            changeSorting={handleChangeSort}
+            deleteUser={handleDelete}
+            showColors={showColors}
+            users={sortedUsers}
+          />
+        )}
       </main>
     </div>
   );
