@@ -31,6 +31,8 @@ export const useUsers = () => {
       initialPageParam: 1,
       // Desactivamos el refetch cuando la ventana no está en foco (Tener cuidado con esto ya que si esta activo, puede hacer muchos fetch)
       refetchOnWindowFocus: false,
+      // Tiempo de expiración de la data, esto nos indica que tan viejos pueden ser los datos que nos devuelve la cache
+      staleTime: 1000 * 60 * 5, // 5 minutos
     });
 
   // Pages es un array con los datos de cada página (users y nextPage)
